@@ -7,8 +7,8 @@ const reportRoutes = require('./routes/reportRoutes');
 const errorHandler = require('./middlewares/errorMiddleware');
 const profileRoutes = require('./routes/profileRoutes');
 
-
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan('dev'));
