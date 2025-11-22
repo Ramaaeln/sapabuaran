@@ -5,7 +5,7 @@ async function getProfileById(userId) {
     .from('profiles')
     .select('-password, -otp, -otp_expires_at')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
 }
@@ -16,7 +16,7 @@ async function updateProfile(userId, payload) {
     .update(payload)
     .eq('id', userId)
     .select('-password, -otp, -otp_expires_at')
-    .single();
+    .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
 }
