@@ -34,6 +34,10 @@ async function sendOTPWhatsApp(phone, otp) {
 
 // REGISTER
 async function registerUser({ full_name, phone, email, birth_date }) {
+  if (!full_name || !phone || !email || !birth_date) {
+    throw new Error('Semua bidang wajib diisi');
+  }
+
   const otp = generateOTP();
   const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -48,7 +52,7 @@ async function registerUser({ full_name, phone, email, birth_date }) {
     status: 'pending',
     otp,
     otp_expires_at: otpExpires,
-    otp_method: 'email', // default email
+    otp_method: 'email',
     role: 'user',
     created_at: new Date(),
     updated_at: new Date(),
@@ -80,7 +84,9 @@ async function verifyOTP({ user_id, otp, password }) {
 
   if (error) throw new Error(error.message);
 
-  return { message: 'Verifikasi berhasil. Akun Anda telah aktif.' };
+  const { data: updatedUser } = await supabase.from('profiles').select('*').eq('id', user_id).single();
+
+  return { user: updatedUser, message: 'Verifikasi berhasil. Akun Anda telah aktif.' };
 }
 
 // RESEND OTP (bisa pilih metode)
@@ -95,7 +101,7 @@ async function resendOTP({ email, otp_method }) {
     otp,
     otp_expires_at: otpExpires,
     updated_at: new Date(),
-    otp_method: otp_method || user.otp_method, // gunakan pilihan user atau default
+    otp_method: otp_method || user.otp_method,
   }).eq('email', email);
 
   if (error) throw new Error(error.message);
@@ -109,9 +115,7 @@ async function resendOTP({ email, otp_method }) {
 }
 
 // LOGIN
-// LOGIN
 async function loginUser({ identifier, password }) {
-  // identifier bisa email atau phone
   const { data: user } = await supabase
     .from('profiles')
     .select('*')
