@@ -1,4 +1,4 @@
-const { createReport, getAllReports } = require('../services/reportService');
+const { createReport, getAllReports, getReportsByUserId } = require('../services/reportService');
 const Joi = require('joi');
 
 const reportSchema = Joi.object({
@@ -29,4 +29,30 @@ async function listReports(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { addReport, listReports };
+async function listMyReports(req, res, next) {
+  try {
+    const userId = req.user.id; 
+    const reports = await getReportsByUserId(userId);
+    res.json(reports);
+  } catch (err) { next(err); }
+}
+async function getReportDetail(req, res, next) {
+  try {
+    const { id } = req.params;
+    const report = await getReportById(id);
+    if (!report) return res.status(404).json({ message: "Report not found" });
+    res.json(report);
+  } catch (err) { next(err); }
+}
+
+async function updateReportStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updated = await updateStatus(id, status, req.user.id);
+    res.json({ message: "Status updated", updated });
+  } catch (err) { next(err); }
+}
+
+module.exports = { addReport, listReports, listMyReports, getReportDetail, updateReportStatus };
