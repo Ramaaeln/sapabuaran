@@ -23,3 +23,5 @@ build/
 Thumbs.db
 
 sapabuaran-firebase-adminsdk-fbsvc-aa1a3ba89e.json
+.vercel
+.env*.local
