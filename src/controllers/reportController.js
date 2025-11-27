@@ -1,5 +1,8 @@
-const { createReport, getAllReports, getReportsByUserId } = require('../services/reportService');
+const { createReport, getAllReports, getReportsByUserId, updateStatus } = require('../services/reportService');
 const Joi = require('joi');
+const supabase = require('../supabase');
+const { createAndSendNotification } = require('../services/notificationService');
+const { sendNotification } = require('../utils/fcm');
 
 const reportSchema = Joi.object({
   user_id: Joi.string().uuid().required(),
@@ -47,12 +50,39 @@ async function getReportDetail(req, res, next) {
 
 async function updateReportStatus(req, res, next) {
   try {
-    const { id } = req.params;
+    const reportId = req.params.id;
     const { status } = req.body;
 
-    const updated = await updateStatus(id, status, req.user.id);
-    res.json({ message: "Status updated", updated });
+    const { data: updated, error } = await supabase
+      .from('reports')
+      .update({ status })
+      .eq('id', reportId)
+      .select()
+      .single();
+
+    if (error) return res.status(400).json({ message: error.message });
+
+    const { data: user, error: userErr } = await supabase
+      .from('profiles')
+      .select('fcm_token')
+      .eq('id', updated.user_id)
+      .single();
+
+    if (userErr) console.log(userErr);
+
+    if (user?.fcm_token) {
+      await sendNotification(
+        user.fcm_token,
+        "Status Laporan Berubah",
+        `Laporan #${reportId} sekarang ${status}`,
+        { reportId }
+      );
+    }
+
+    res.json(updated);
+
   } catch (err) { next(err); }
 }
 
-module.exports = { addReport, listReports, listMyReports, getReportDetail, updateReportStatus };
+
+module.exports = { addReport, listReports, listMyReports, getReportDetail, updateReportStatus, updateStatus };

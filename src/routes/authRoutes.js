@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, verifyOTP, resendOTP, loginUser } = require('../services/authService');
+const { registerUser, verifyOTP, resendOTP, loginUser,updateFcmToken} = require('../services/authService');
+const { authenticate } = require('../middlewares/authMiddleware');
 
 // Register → OTP default dikirim ke email
 router.post('/register', async (req, res) => {
@@ -45,5 +46,16 @@ router.post('/login', async (req, res) => {
     }
   });
   
+  router.post('/fcm-token', authenticate, async (req, res, next) => {
+    try {
+      const { token } = req.body;
+  
+      if (!token) return res.status(400).json({ message: 'FCM token required' });
+  
+      await updateFcmToken(req.user.id, token);
+      res.json({ message: 'FCM token updated' });
+  
+    } catch (err) { next(err); }
+  });
 
 module.exports = router;

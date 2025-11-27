@@ -138,4 +138,13 @@ async function loginUser({ identifier, password }) {
   return { user, token };
 }
 
-module.exports = { registerUser, verifyOTP, resendOTP, loginUser };
+async function updateFcmToken(userId, token) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ fcm_token: token })
+    .eq('id', userId);
+
+  if (error) throw new Error(error.message);
+}
+
+module.exports = { registerUser, verifyOTP, resendOTP, loginUser,updateFcmToken };
