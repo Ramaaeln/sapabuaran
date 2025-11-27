@@ -54,6 +54,7 @@ async function registerUser({ full_name, phone, email, birth_date }) {
     otp_expires_at: otpExpires,
     otp_method: 'email',
     role: 'user',
+    fcm_token,
     created_at: new Date(),
     updated_at: new Date(),
   }]).select().single();
