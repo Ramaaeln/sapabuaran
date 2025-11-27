@@ -116,7 +116,7 @@ async function resendOTP({ email, otp_method }) {
 }
 
 // LOGIN
-async function loginUser({ identifier, password }) {
+async function loginUser({ identifier, password, fcmToken }) {
   const { data: user } = await supabase
     .from('profiles')
     .select('*')
@@ -129,15 +129,18 @@ async function loginUser({ identifier, password }) {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new Error('Password salah');
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, phone: user.phone, role: user.role || 'user' },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  // update FCM token jika dikirim
+  if (fcmToken) {
+    await updateFcmToken(user.id, fcmToken);
+    user.fcm_token = fcmToken;
+  }
+
+  const token = jwt.sign({ id: user.id, email: user.email, phone: user.phone, role: user.role || 'user' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
   delete user.password;
   return { user, token };
 }
+
 
 async function updateFcmToken(userId, token) {
   const { error } = await supabase
