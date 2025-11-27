@@ -6,7 +6,7 @@ const {
   getReportById 
 } = require('../services/reportService');
 const Joi = require('joi');
-const supabase = require('../supabase');
+const supabase = require('../utils/supabaseClient');
 const { sendNotification } = require('../utils/fcm'); // Pastikan fcm.js pakai ENV safe Firebase Admin
 
 // ====================

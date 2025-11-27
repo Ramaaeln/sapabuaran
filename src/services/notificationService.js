@@ -1,5 +1,5 @@
 const admin = require('./firebase'); 
-const supabase = require('../supabase');
+const supabase = require('../utils/supabaseClient');
 
 async function createAndSendNotification(userId, title, body, meta = {}) {
   try {

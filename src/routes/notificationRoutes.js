@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const admin = require('../services/firebase'); 
-const supabase = require('../supabase');
+const supabase = require('../utils/supabaseClient');
 
 
 router.post('/send', async (req, res) => {

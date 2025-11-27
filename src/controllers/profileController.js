@@ -1,5 +1,5 @@
 const { getProfileById, updateProfile } = require('../services/profileService');
-const supabase = require('../utils/supabaseClient'); // pastikan sudah import supabase client
+const supabase = require('../utils/supabaseClient'); 
 const Joi = require('joi');
 
 const updateSchema = Joi.object({
