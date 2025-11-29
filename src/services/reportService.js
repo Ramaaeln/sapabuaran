@@ -51,7 +51,7 @@ async function updateStatus(reportId, status, adminId) {
     fields.resolved_at = new Date().toISOString();
   }
 
-  const { data, error } = await supabase
+  const { data: updatedReport, error } = await supabase
     .from('reports')
     .update(fields)
     .eq('id', reportId)
@@ -59,7 +59,21 @@ async function updateStatus(reportId, status, adminId) {
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+
+  const reporterId = updatedReport.user_id; 
+
+  const title = 'Laporan Anda Diperbarui';
+  const body = `Status laporan ID ${reportId} sekarang: "${status}"`;
+
+  try {
+    await createAndSendNotification(reporterId, title, body, { reportId, status });
+    console.log(`Notifikasi dikirim ke user ${reporterId}`);
+  } catch (notifErr) {
+    console.error('Gagal kirim notifikasi:', notifErr);
+  }
+
+  return updatedReport;
 }
+
 
 module.exports = { createReport, getAllReports, getReportsByUserId, getReportById, updateStatus };
