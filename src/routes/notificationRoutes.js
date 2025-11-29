@@ -3,7 +3,7 @@ const router = express.Router();
 const admin = require('../services/firebase');
 const supabase = require('../utils/supabaseClient');
 const rateLimit = require('express-rate-limit');
-const { authenticate, authorizeRoles } = require('../middleware/authMiddleware');
+const { authenticate, authorizeRoles } = require('../middlewares/authMiddleware');
 
 // 1. Rate limiting (anti spam)
 const notifLimiter = rateLimit({
