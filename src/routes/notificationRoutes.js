@@ -134,8 +134,9 @@ router.post(
         try {
           await admin.messaging().send({
             token,
-            notification: { title, body }
+            data: { title, body, click_action: "FLUTTER_NOTIFICATION_CLICK" }
           });
+          
 
           successCount++;
         } catch (err) {
