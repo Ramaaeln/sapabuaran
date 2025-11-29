@@ -1,4 +1,5 @@
 const supabase = require('../utils/supabaseClient');
+const { createAndSendNotification } = require('./notificationService'); 
 
 async function createReport(report) {
   const { data, error } = await supabase.from('reports').insert([report]).select().single();
