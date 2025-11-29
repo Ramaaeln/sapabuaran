@@ -64,6 +64,33 @@ router.post(
   }
 );
 
+
+// -----------------------------------------------------------------------------
+// GET ALL BROADCAST LOG
+// -----------------------------------------------------------------------------
+router.get(
+  '/broadcast',
+  authenticate,
+  authorizeRoles('admin'),
+  async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from('broadcast_logs')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return res.status(500).json({ message: "DB error" });
+      }
+
+      return res.json({ notifications: data });
+    } catch (err) {
+      console.error("GET broadcast error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
 // -----------------------------------------------------------------------------
 // BROADCAST NOTIFICATION (NO sendMulticast) — 100% COMPAT VERCEL
 // -----------------------------------------------------------------------------
@@ -114,7 +141,6 @@ router.post(
         } catch (err) {
           failureCount++;
 
-          // Jika token invalid → hapus dari database otomatis
           if (err.errorInfo?.code === 'messaging/registration-token-not-registered') {
             await supabase
               .from('profiles')
@@ -127,6 +153,17 @@ router.post(
       }
 
       console.log(`[BROADCAST] Admin ${req.user.id} → Sent ${successCount}, Failed ${failureCount}`);
+
+      // -----------------------------------------------------------------------
+      //  🔥 MASUKKAN DI SINI UNTUK SIMPAN LOG BROADCAST
+      // -----------------------------------------------------------------------
+      await supabase.from('broadcast_logs').insert([{
+        title,
+        body,
+        created_at: new Date().toISOString()
+      }]);
+
+      // -----------------------------------------------------------------------
 
       return res.json({
         success: true,
