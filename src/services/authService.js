@@ -19,9 +19,38 @@ async function sendOTPEmail(email, otp) {
     from: `"SAPABUARAN" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: 'Kode OTP Anda - SAPABUARAN',
-    text: `Kode OTP Anda adalah ${otp}. Berlaku 10 menit.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+        <!-- Banner -->
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="../../assets/banner-emails.png" alt="SAPABUARAN" style="max-width: 100%; height: auto;"/>
+        </div>
+
+        <!-- Greeting -->
+        <h2 style="color: #239BA7;">Halo!</h2>
+        <p>Kode OTP Anda adalah:</p>
+
+        <!-- OTP -->
+        <div style="font-size: 24px; font-weight: bold; color: #FF5722; text-align: center; margin: 20px 0;">
+          ${otp}
+        </div>
+
+        <p style="color: #555;">
+          Kode ini berlaku selama 10 menit. Jangan bagikan kode ini kepada siapapun.
+        </p>
+
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+
+        <!-- Footer -->
+        <p style="font-size: 12px; color: #999; text-align: center;">
+          SAPABUARAN &copy; 2025. Semua hak cipta dilindungi.
+        </p>
+      </div>
+    `,
   });
 }
+
+
 
 async function sendOTPWhatsApp(phone, otp) {
   const message = `Kode OTP Anda adalah *${otp}*. Berlaku 10 menit. Jangan berikan ke siapapun.`;
